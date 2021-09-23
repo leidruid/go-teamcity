@@ -15,6 +15,7 @@ const (
 	StepTypeDotnetCli BuildStepType = "dotnet.cli"
 	//StepTypeCommandLine (shell/cmd) step type
 	StepTypeCommandLine          BuildStepType = "simpleRunner"
+	StepTypeGradle               BuildStepType = "gradle-runner"
 	StepTypeOctopusPushPackage   BuildStepType = "octopus.push.package"
 	StepTypeOctopusCreateRelease BuildStepType = "octopus.create.release"
 )
