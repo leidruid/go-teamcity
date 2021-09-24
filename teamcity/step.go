@@ -104,6 +104,10 @@ var stepReadingFunc = func(dt []byte, out interface{}) error {
 		var ocr StepOctopusCreateRelease
 		err = ocr.UnmarshalJSON(dt)
 		step = &ocr
+	case string(StepTypeGradle):
+		var grd StepGradle
+		err = grd.UnmarshalJSON(dt)
+		step = &grd
 	default:
 		return fmt.Errorf("Unsupported step type: '%s' (id:'%s')", payload.Type, payload.ID)
 	}
