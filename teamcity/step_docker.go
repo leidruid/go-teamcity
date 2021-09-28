@@ -98,12 +98,12 @@ func (s *StepDocker) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if aux.Type != string(StepTypeGradle) {
-		return fmt.Errorf("invalid type %s trying to deserialize into StepGradle entity", aux.Type)
+	if aux.Type != string(StepTypeDocker) {
+		return fmt.Errorf("invalid type %s trying to deserialize into StepDocker entity", aux.Type)
 	}
 	s.Name = aux.Name
 	s.ID = aux.ID
-	s.stepType = StepTypeGradle
+	s.stepType = StepTypeDocker
 
 	props := aux.Properties
 	if v, ok := props.GetOk("docker.command.type"); ok {
