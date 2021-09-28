@@ -109,6 +109,10 @@ var stepReadingFunc = func(dt []byte, out interface{}) error {
 		var grd StepGradle
 		err = grd.UnmarshalJSON(dt)
 		step = &grd
+	case string(StepTypeDocker):
+		var dck StepDocker
+		err = dck.UnmarshalJSON(dt)
+		step = &dck
 	default:
 		return fmt.Errorf("Unsupported step type: '%s' (id:'%s')", payload.Type, payload.ID)
 	}
