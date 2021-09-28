@@ -114,13 +114,12 @@ func (s *StepDocker) UnmarshalJSON(data []byte) error {
 		s.CommandType = v
 	}
 	if v, ok := props.GetOk("dockerfile.source"); ok {
+		s.CommandSource = v
 		if v == "PATH" {
-			s.CommandSource = v
 			if c, cok := props.GetOk("dockerfile.path"); cok {
 				s.Content = c
 			}
 		} else if v == "CONTENT" {
-			s.CommandSource = v
 			if c, cok := props.GetOk("dockerfile.content"); cok {
 				s.Content = c
 			}
