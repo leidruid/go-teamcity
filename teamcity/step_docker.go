@@ -9,11 +9,11 @@ import (
 
 //StepCommandLine represents a a build step of type "CommandLine"
 type StepDocker struct {
-	ID         string
-	Name       string
-	stepType   string
-	stepJSON   *stepJSON
-	fromSource bool
+	ID            string
+	Name          string
+	stepType      string
+	stepJSON      *stepJSON
+	CommandSource string
 	// command.args
 	Args string
 	// docker.command.type
@@ -30,19 +30,19 @@ type StepDocker struct {
 	//docker.sub.command
 }
 
-func NewStepDocker(name string, fromSource bool, dockerCommandType string, dockerContent string, dockerArgs string, dockerTag string) (*StepDocker, error) {
+func NewStepDocker(name string, fromSource string, dockerCommandType string, dockerContent string, dockerArgs string, dockerTag string) (*StepDocker, error) {
 	if dockerContent == "" {
 		return nil, errors.New("tasks is required")
 	}
 	return &StepDocker{
-		Name:        name,
-		stepType:    StepTypeDocker,
-		CommandType: dockerCommandType,
-		Content:     dockerContent,
-		Args:        dockerArgs,
-		Tag:         dockerTag,
-		fromSource:  fromSource,
-		ExecuteMode: StepExecuteModeDefault,
+		Name:          name,
+		stepType:      StepTypeDocker,
+		CommandType:   dockerCommandType,
+		Content:       dockerContent,
+		Args:          dockerArgs,
+		Tag:           dockerTag,
+		CommandSource: fromSource,
+		ExecuteMode:   StepExecuteModeDefault,
 	}, nil
 }
 
@@ -54,10 +54,6 @@ func (s *StepDocker) GetID() string {
 //GetName is a wrapper implementation for Name field, to comply with Step interface
 func (s *StepDocker) GetName() string {
 	return s.Name
-}
-
-func (s *StepDocker) GetContentIsFromSource() string {
-	return strconv.FormatBool(s.fromSource)
 }
 
 //Type returns the step type, in this case "StepTypeCommandLine".
@@ -74,7 +70,7 @@ func (s *StepDocker) properties() *Properties {
 		props.AddOrReplaceValue("docker.push.remove.image", strconv.FormatBool(s.PushRemoveImage))
 	}
 	if s.CommandType == "build" {
-		if s.fromSource {
+		if s.CommandSource == "CONTENT" {
 			props.AddOrReplaceValue("dockerfile.content", s.Content)
 		} else {
 			props.AddOrReplaceValue("dockerfile.path", s.Content)
@@ -119,12 +115,12 @@ func (s *StepDocker) UnmarshalJSON(data []byte) error {
 	}
 	if v, ok := props.GetOk("dockerfile.source"); ok {
 		if v == "PATH" {
-			s.fromSource = false
+			s.CommandSource = v
 			if c, cok := props.GetOk("dockerfile.path"); cok {
 				s.Content = c
 			}
 		} else if v == "CONTENT" {
-			s.fromSource = true
+			s.CommandSource = v
 			if c, cok := props.GetOk("dockerfile.content"); cok {
 				s.Content = c
 			}
