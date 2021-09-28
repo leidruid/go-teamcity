@@ -16,6 +16,7 @@ const (
 	//StepTypeCommandLine (shell/cmd) step type
 	StepTypeCommandLine          BuildStepType = "simpleRunner"
 	StepTypeGradle               BuildStepType = "gradle-runner"
+	StepTypeDocker               BuildStepType = "DockerCommand"
 	StepTypeOctopusPushPackage   BuildStepType = "octopus.push.package"
 	StepTypeOctopusCreateRelease BuildStepType = "octopus.create.release"
 )
