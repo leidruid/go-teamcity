@@ -66,6 +66,7 @@ func (s *StepDocker) properties() *Properties {
 		props.AddOrReplaceValue("docker.push.remove.image", strconv.FormatBool(s.PushRemoveImage))
 	}
 	if s.CommandType == "build" {
+		props.AddOrReplaceValue("dockerfile.source", s.CommandSource)
 		if s.CommandSource == "CONTENT" {
 			props.AddOrReplaceValue("dockerfile.content", s.Content)
 		} else {
