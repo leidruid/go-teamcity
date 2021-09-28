@@ -2,7 +2,6 @@ package teamcity
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 )
@@ -31,17 +30,14 @@ type StepDocker struct {
 }
 
 func NewStepDocker(name string, fromSource string, dockerCommandType string, dockerContent string, dockerArgs string, dockerTag string) (*StepDocker, error) {
-	if dockerContent == "" {
-		return nil, errors.New("tasks is required")
-	}
 	return &StepDocker{
 		Name:          name,
 		stepType:      StepTypeDocker,
+		CommandSource: fromSource,
 		CommandType:   dockerCommandType,
 		Content:       dockerContent,
 		Args:          dockerArgs,
 		Tag:           dockerTag,
-		CommandSource: fromSource,
 		ExecuteMode:   StepExecuteModeDefault,
 	}, nil
 }
