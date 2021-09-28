@@ -54,7 +54,7 @@ func (s *StepDocker) GetName() string {
 
 //Type returns the step type, in this case "StepTypeCommandLine".
 func (s *StepDocker) Type() BuildStepType {
-	return StepTypeGradle
+	return StepTypeDocker
 }
 
 func (s *StepDocker) properties() *Properties {
