@@ -2,43 +2,45 @@ package teamcity
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 )
 
-//StepCommandLine represents a a build step of type "CommandLine"
+//StepDocker represents a build step of type "Docker"
 type StepDocker struct {
-	ID            string
-	Name          string
-	stepType      string
-	stepJSON      *stepJSON
+	ID       string
+	Name     string
+	stepType string
+	stepJSON *stepJSON
+	// docker.command.type
+	CommandType string
+	//dockerfile.source
 	CommandSource string
 	// command.args
 	Args string
-	// docker.command.type
-	CommandType string
 	// docker.push.remove.image
 	PushRemoveImage bool
 	// dockerfile.content
 	// dockerfile.path
+	// docker.sub.command
 	Content string
 	// docker.image.namesAndTags
 	Tag string
+	// teamcity.build.workingDir
+	WorkingDir string
 	// teamcity.step.mode
 	ExecuteMode StepExecuteMode
-	//docker.sub.command
 }
 
-func NewStepDocker(name string, fromSource string, dockerCommandType string, dockerContent string, dockerArgs string, dockerTag string) (*StepDocker, error) {
+func NewStepDocker(name string, commandType string) (*StepDocker, error) {
+	if commandType == "" {
+		return nil, errors.New("need to set command_type parameter")
+	}
 	return &StepDocker{
-		Name:          name,
-		stepType:      StepTypeDocker,
-		CommandSource: fromSource,
-		CommandType:   dockerCommandType,
-		Content:       dockerContent,
-		Args:          dockerArgs,
-		Tag:           dockerTag,
-		ExecuteMode:   StepExecuteModeDefault,
+		Name:        name,
+		stepType:    StepTypeDocker,
+		CommandType: commandType,
 	}, nil
 }
 
@@ -52,7 +54,7 @@ func (s *StepDocker) GetName() string {
 	return s.Name
 }
 
-//Type returns the step type, in this case "StepTypeCommandLine".
+//Type returns the step type, in this case "StepTypeDocker".
 func (s *StepDocker) Type() BuildStepType {
 	return StepTypeDocker
 }
@@ -64,16 +66,23 @@ func (s *StepDocker) properties() *Properties {
 	props.AddOrReplaceValue("docker.command.type", s.CommandType)
 	if s.CommandType == "push" {
 		props.AddOrReplaceValue("docker.push.remove.image", strconv.FormatBool(s.PushRemoveImage))
+		props.AddOrReplaceValue("dockerfile.source", "PATH")
+		props.AddOrReplaceValue("docker.image.namesAndTags", s.Tag)
 	}
 	if s.CommandType == "build" {
 		props.AddOrReplaceValue("dockerfile.source", s.CommandSource)
+		props.AddOrReplaceValue("docker.image.namesAndTags", s.Tag)
 		if s.CommandSource == "CONTENT" {
 			props.AddOrReplaceValue("dockerfile.content", s.Content)
 		} else {
 			props.AddOrReplaceValue("dockerfile.path", s.Content)
 		}
 	}
-	props.AddOrReplaceValue("docker.image.namesAndTags", s.Tag)
+	if s.CommandType == "other" {
+		props.AddOrReplaceValue("dockerfile.source", "PATH")
+		props.AddOrReplaceValue("docker.sub.command", s.Content)
+		props.AddOrReplaceValue("teamcity.build.workingDir", s.WorkingDir)
+	}
 	return props
 }
 
@@ -86,13 +95,13 @@ func (s *StepDocker) serializable() *stepJSON {
 	}
 }
 
-//MarshalJSON implements JSON serialization for StepCommandLine
+//MarshalJSON implements JSON serialization for StepDocker
 func (s *StepDocker) MarshalJSON() ([]byte, error) {
 	out := s.serializable()
 	return json.Marshal(out)
 }
 
-//UnmarshalJSON implements JSON deserialization for StepCommandLine
+//UnmarshalJSON implements JSON deserialization for StepDocker
 func (s *StepDocker) UnmarshalJSON(data []byte) error {
 	var aux stepJSON
 	if err := json.Unmarshal(data, &aux); err != nil {
@@ -109,6 +118,12 @@ func (s *StepDocker) UnmarshalJSON(data []byte) error {
 	props := aux.Properties
 	if v, ok := props.GetOk("docker.command.type"); ok {
 		s.CommandType = v
+	}
+	if v, ok := props.GetOk("docker.sub.command"); ok {
+		s.CommandType = v
+	}
+	if v, ok := props.GetOk("teamcity.build.workingDir"); ok {
+		s.WorkingDir = v
 	}
 	if v, ok := props.GetOk("dockerfile.source"); ok {
 		s.CommandSource = v
