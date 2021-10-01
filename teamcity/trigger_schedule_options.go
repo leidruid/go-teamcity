@@ -12,6 +12,7 @@ type TriggerScheduleOptions struct {
 	RevisionRuleBuildBranch             string                     `prop:"revisionRuleBuildBranch"`
 	EnforceCleanCheckout                bool                       `prop:"enforceCleanCheckout"`
 	EnforceCleanCheckoutForDependencies bool                       `prop:"enforceCleanCheckoutForDependencies"`
+	BranchFilter                        string                     `prop:"branchFilter"`
 }
 
 //NewTriggerScheduleOptions returns a TriggerScheduleOptions with default values
