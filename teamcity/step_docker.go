@@ -20,7 +20,7 @@ type StepDocker struct {
 	// command.args
 	Args string
 	// docker.push.remove.image
-	PushRemoveImage bool
+	PushRemoveImage *bool
 	// dockerfile.content
 	// dockerfile.path
 	// docker.sub.command
@@ -65,7 +65,7 @@ func (s *StepDocker) properties() *Properties {
 	props.AddOrReplaceValue("command.args", s.Args)
 	props.AddOrReplaceValue("docker.command.type", s.CommandType)
 	if s.CommandType == "push" {
-		props.AddOrReplaceValue("docker.push.remove.image", strconv.FormatBool(s.PushRemoveImage))
+		props.AddOrReplaceValue("docker.push.remove.image", strconv.FormatBool(*s.PushRemoveImage))
 		props.AddOrReplaceValue("dockerfile.source", "PATH")
 		props.AddOrReplaceValue("docker.image.namesAndTags", s.Tag)
 	}
@@ -74,7 +74,7 @@ func (s *StepDocker) properties() *Properties {
 		props.AddOrReplaceValue("docker.image.namesAndTags", s.Tag)
 		if s.CommandSource == "CONTENT" {
 			props.AddOrReplaceValue("dockerfile.content", s.Content)
-		} else {
+		} else if s.CommandSource == "PATH" {
 			props.AddOrReplaceValue("dockerfile.path", s.Content)
 		}
 	}
@@ -120,7 +120,9 @@ func (s *StepDocker) UnmarshalJSON(data []byte) error {
 		s.CommandType = v
 	}
 	if v, ok := props.GetOk("docker.sub.command"); ok {
-		s.CommandType = v
+		if s.CommandType == "other" {
+			s.Content = v
+		}
 	}
 	if v, ok := props.GetOk("teamcity.build.workingDir"); ok {
 		s.WorkingDir = v
@@ -142,10 +144,13 @@ func (s *StepDocker) UnmarshalJSON(data []byte) error {
 	}
 	if v, ok := props.GetOk("docker.push.remove.image"); ok {
 		if v == "true" {
-			s.PushRemoveImage = true
+			s.PushRemoveImage = NewBool(true)
 		} else {
-			s.PushRemoveImage = false
+			s.PushRemoveImage = nil
 		}
+	}
+	if v, ok := props.GetOk("docker.image.namesAndTags"); ok {
+		s.Tag = v
 	}
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
 		s.ExecuteMode = StepExecuteMode(v)

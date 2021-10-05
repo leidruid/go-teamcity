@@ -117,7 +117,10 @@ func (t *TriggerSchedule) read(dt *triggerJSON) error {
 	}
 
 	if v, ok := dt.Properties.GetOk("triggerRules"); ok {
-		t.Rules = strings.Split(v, "\n")
+		rules := strings.Split(v, "\n")
+		//		if len(rules) > 0 {
+		t.Rules = rules
+		//		}
 	}
 
 	if v, ok := dt.Properties.GetOk("timezone"); ok {

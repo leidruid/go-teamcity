@@ -159,6 +159,15 @@ func (s *BuildFeatureService) readBuildFeatureResponse(resp *http.Response) (Bui
 
 			out = &csp
 		}
+	case "DockerSupport":
+		{
+			var dsp FeatureDockerSupport
+			if err := dsp.UnmarshalJSON(bodyBytes); err != nil {
+				return nil, err
+			}
+
+			out = &dsp
+		}
 	default:
 		return nil, fmt.Errorf("Unsupported build feature type: '%s' (id:'%s') for buildTypeID: %s", payload.Type, payload.ID, s.BuildTypeID)
 	}
