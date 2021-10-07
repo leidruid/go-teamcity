@@ -101,15 +101,27 @@ func (f *FeatureCommitStatusPublisher) UnmarshalJSON(data []byte) error {
 	f.disabled = *disabled
 	f.properties = NewProperties(aux.Properties.Items...)
 
-	opt, err := CommitStatusPublisherGithubOptionsFromProperties(f.properties)
-	if err != nil {
-		return err
+	if p, ok := f.properties.GetOk("publisherId"); ok {
+		if p == "githubStatusPublisher" {
+			opt, err := CommitStatusPublisherGithubOptionsFromProperties(f.properties)
+			if err != nil {
+				return err
+			}
+			f.Options = opt
+		}
+
+		if p == "atlassianStashPublisher" {
+			opt, err := CommitStatusPublisherBitbucketServerOptionsFromProperties(f.properties)
+			if err != nil {
+				return err
+			}
+			f.Options = opt
+		}
 	}
 
 	if v, ok := f.properties.GetOk("vcsRootId"); ok {
 		f.vcsRootID = v
 	}
-	f.Options = opt
 
 	return nil
 }
