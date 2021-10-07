@@ -23,7 +23,7 @@ func NewTriggerBuildFinishOptions(afterSuccessfulBuildOnly bool, branchFilter []
 func (o *TriggerBuildFinishOptions) properties() *Properties {
 	props := NewPropertiesEmpty()
 
-	//Defaults to false, so ommit emitting the property if 'false'
+	//Defaults to false, so omit emitting the property if 'false'
 	if o.AfterSuccessfulBuildOnly {
 		props.AddOrReplaceValue("afterSuccessfulBuildOnly", strconv.FormatBool(o.AfterSuccessfulBuildOnly))
 	}

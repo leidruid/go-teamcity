@@ -168,6 +168,15 @@ func (s *BuildFeatureService) readBuildFeatureResponse(resp *http.Response) (Bui
 
 			out = &dsp
 		}
+	case "VcsLabeling":
+		{
+			var vsp FeatureVcsLabeling
+			if err := vsp.UnmarshalJSON(bodyBytes); err != nil {
+				return nil, err
+			}
+
+			out = &vsp
+		}
 	default:
 		return nil, fmt.Errorf("Unsupported build feature type: '%s' (id:'%s') for buildTypeID: %s", payload.Type, payload.ID, s.BuildTypeID)
 	}
