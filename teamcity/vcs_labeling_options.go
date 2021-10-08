@@ -62,10 +62,6 @@ func VcsLabelingOptionsFromProperties(p *Properties) (*VcsLabelingOptions, error
 		return nil, fmt.Errorf("Properties do not have 'vcsRootId' key")
 	}
 
-	//if branch, ok := p.GetOk("branchFilter"); ok {
-	//	out.BranchFilter = branch
-	//}
-
 	if v, ok := p.GetOk("successfulOnly"); ok {
 		if v == "true" {
 			out.SuccessfulOnly = true

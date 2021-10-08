@@ -177,6 +177,24 @@ func (s *BuildFeatureService) readBuildFeatureResponse(resp *http.Response) (Bui
 
 			out = &vsp
 		}
+	case "ssh-agent-build-feature":
+		{
+			var ssp FeatureSshAgent
+			if err := ssp.UnmarshalJSON(bodyBytes); err != nil {
+				return nil, err
+			}
+
+			out = &ssp
+		}
+	case "perfmon":
+		{
+			var psp FeaturePerformanceMonitor
+			if err := psp.UnmarshalJSON(bodyBytes); err != nil {
+				return nil, err
+			}
+
+			out = &psp
+		}
 	default:
 		return nil, fmt.Errorf("Unsupported build feature type: '%s' (id:'%s') for buildTypeID: %s", payload.Type, payload.ID, s.BuildTypeID)
 	}
