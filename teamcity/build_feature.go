@@ -195,6 +195,23 @@ func (s *BuildFeatureService) readBuildFeatureResponse(resp *http.Response) (Bui
 
 			out = &psp
 		}
+	case "pullRequests":
+		{
+			var plsp FeaturePullRequests
+			if err := plsp.UnmarshalJSON(bodyBytes); err != nil {
+				return nil, err
+			}
+
+			out = &plsp
+		}
+	case "JetBrains.FileContentReplacer":
+		{
+			var jsp FeatureFileContentReplacer
+			if err := jsp.UnmarshalJSON(bodyBytes); err != nil {
+				return nil, err
+			}
+			out = &jsp
+		}
 	default:
 		return nil, fmt.Errorf("Unsupported build feature type: '%s' (id:'%s') for buildTypeID: %s", payload.Type, payload.ID, s.BuildTypeID)
 	}

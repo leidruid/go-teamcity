@@ -4,11 +4,8 @@ import "fmt"
 
 // StatusPublisherBitbucketServerOptions represents parameters used to create Github Commit Status Publisher Feature
 type StatusPublisherBitbucketServerOptions struct {
-	//Host is the Bitbucket Server URL
-	Host string
-	//Username
+	Host     string
 	Username string
-	//Password
 	Password string
 }
 
