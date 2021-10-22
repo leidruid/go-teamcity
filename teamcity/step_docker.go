@@ -153,7 +153,7 @@ func (s *StepDocker) UnmarshalJSON(data []byte) error {
 		s.Tag = v
 	}
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
-		s.ExecuteMode = StepExecuteMode(v)
+		s.ExecuteMode = v
 	}
 	return nil
 }

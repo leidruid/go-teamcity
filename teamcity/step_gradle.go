@@ -7,16 +7,12 @@ import (
 	"strconv"
 )
 
-//StepCommandLine represents a a build step of type "CommandLine"
+// StepGradle represents a build step of type "StepGradle"
 type StepGradle struct {
-	ID       string
-	Name     string
-	stepType string
-	stepJSON *stepJSON
-	//CoverageEmmaIncludeSource	bool
-	//CoverageEmmaInstrParamters string
-	//CoverageIdeaIncludePatterns string
-	//ToolJacoco	string
+	ID               string
+	Name             string
+	stepType         string
+	stepJSON         *stepJSON
 	GradleCmdParams  string
 	GradleBuildFile  string
 	GradleTasksNames string
@@ -24,7 +20,7 @@ type StepGradle struct {
 	ExecuteMode      StepExecuteMode
 }
 
-func NewStepGradle(name string, tasks string, gradleParams string, gradleBuildFile string) (*StepGradle, error) {
+func NewStepGradle(name, tasks, gradleParams, gradleBuildFile, executeStep string) (*StepGradle, error) {
 	if tasks == "" {
 		return nil, errors.New("tasks is required")
 	}
@@ -35,7 +31,7 @@ func NewStepGradle(name string, tasks string, gradleParams string, gradleBuildFi
 		GradleBuildFile:  gradleBuildFile,
 		GradleTasksNames: tasks,
 		GradleWrapperUse: true,
-		ExecuteMode:      StepExecuteModeDefault,
+		ExecuteMode:      executeStep,
 	}, nil
 }
 
@@ -49,14 +45,14 @@ func (s *StepGradle) GetName() string {
 	return s.Name
 }
 
-//Type returns the step type, in this case "StepTypeCommandLine".
+//Type returns the step type, in this case "StepTypeGradle".
 func (s *StepGradle) Type() BuildStepType {
 	return StepTypeGradle
 }
 
 func (s *StepGradle) properties() *Properties {
 	props := NewPropertiesEmpty()
-	props.AddOrReplaceValue("teamcity.step.mode", string(s.ExecuteMode))
+	props.AddOrReplaceValue("teamcity.step.mode", s.ExecuteMode)
 	props.AddOrReplaceValue("ui.gradleRunner.additional.gradle.cmd.params", s.GradleCmdParams)
 	props.AddOrReplaceValue("ui.gradleRunner.gradle.tasks.names", s.GradleTasksNames)
 	props.AddOrReplaceValue("ui.gradleRunner.gradle.build.file", s.GradleBuildFile)
@@ -75,13 +71,13 @@ func (s *StepGradle) serializable() *stepJSON {
 	}
 }
 
-//MarshalJSON implements JSON serialization for StepCommandLine
+//MarshalJSON implements JSON serialization for StepGradle
 func (s *StepGradle) MarshalJSON() ([]byte, error) {
 	out := s.serializable()
 	return json.Marshal(out)
 }
 
-//UnmarshalJSON implements JSON deserialization for StepCommandLine
+//UnmarshalJSON implements JSON deserialization for StepGradle
 func (s *StepGradle) UnmarshalJSON(data []byte) error {
 	var aux stepJSON
 	if err := json.Unmarshal(data, &aux); err != nil {
@@ -113,7 +109,7 @@ func (s *StepGradle) UnmarshalJSON(data []byte) error {
 		s.GradleBuildFile = v
 	}
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
-		s.ExecuteMode = StepExecuteMode(v)
+		s.ExecuteMode = v
 	}
 	return nil
 }

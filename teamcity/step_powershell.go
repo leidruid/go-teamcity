@@ -24,7 +24,7 @@ type StepPowershell struct {
 }
 
 //NewStepPowershellScriptFile creates a powershell build step that runs a script file instead of inline code.
-func NewStepPowershellScriptFile(name string, scriptFile string, scriptArgs string) (*StepPowershell, error) {
+func NewStepPowershellScriptFile(name, scriptFile, scriptArgs, executeStep string) (*StepPowershell, error) {
 	if scriptFile == "" {
 		return nil, errors.New("scriptFile is required")
 	}
@@ -35,12 +35,12 @@ func NewStepPowershellScriptFile(name string, scriptFile string, scriptArgs stri
 		stepType:    StepTypePowershell,
 		ScriptFile:  scriptFile,
 		ScriptArgs:  scriptArgs,
-		ExecuteMode: StepExecuteModeDefault,
+		ExecuteMode: executeStep,
 	}, nil
 }
 
 //NewStepPowershellCode creates a powershell build step that runs the inline code.
-func NewStepPowershellCode(name string, code string) (*StepPowershell, error) {
+func NewStepPowershellCode(name, code, executeStep string) (*StepPowershell, error) {
 	if code == "" {
 		return nil, errors.New("code is required")
 	}
@@ -49,7 +49,7 @@ func NewStepPowershellCode(name string, code string) (*StepPowershell, error) {
 		Name:        name,
 		stepType:    StepTypePowershell,
 		Code:        code,
-		ExecuteMode: StepExecuteModeDefault,
+		ExecuteMode: executeStep,
 	}, nil
 }
 

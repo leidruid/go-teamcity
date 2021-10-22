@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-//StepCommandLine represents a a build step of type "CommandLine"
+// StepCommandLine represents a build step of type "CommandLine"
 type StepCommandLine struct {
 	ID           string
 	Name         string
@@ -20,26 +20,28 @@ type StepCommandLine struct {
 	//CommandParameters are additional parameters to be passed on to the CommandExecutable.
 	CommandParameters string
 	//ExecuteMode is the execute mode for the step. See StepExecuteMode for details.
-	ExecuteMode StepExecuteMode
+	ExecuteMode      StepExecuteMode
+	ExecuteCondition []string
 }
 
 //NewStepCommandLineScript creates a command line build step that runs an inline platform-specific script.
-func NewStepCommandLineScript(name string, script string) (*StepCommandLine, error) {
+func NewStepCommandLineScript(name, script, executeStep string, executeConditions []string) (*StepCommandLine, error) {
 	if script == "" {
 		return nil, errors.New("script is required")
 	}
 
 	return &StepCommandLine{
-		Name:         name,
-		isExecutable: false,
-		stepType:     StepTypeCommandLine,
-		CustomScript: script,
-		ExecuteMode:  StepExecuteModeDefault,
+		Name:             name,
+		isExecutable:     false,
+		stepType:         StepTypeCommandLine,
+		CustomScript:     script,
+		ExecuteMode:      executeStep,
+		ExecuteCondition: executeConditions,
 	}, nil
 }
 
 //NewStepCommandLineExecutable creates a command line that invokes an external executable.
-func NewStepCommandLineExecutable(name string, executable string, args string) (*StepCommandLine, error) {
+func NewStepCommandLineExecutable(name, executable, args, executeStep string, executeConditions []string) (*StepCommandLine, error) {
 	if executable == "" {
 		return nil, errors.New("executable is required")
 	}
@@ -50,7 +52,8 @@ func NewStepCommandLineExecutable(name string, executable string, args string) (
 		isExecutable:      true,
 		CommandExecutable: executable,
 		CommandParameters: args,
-		ExecuteMode:       StepExecuteModeDefault,
+		ExecuteMode:       executeStep,
+		ExecuteCondition:  executeConditions,
 	}, nil
 }
 
@@ -132,7 +135,23 @@ func (s *StepCommandLine) UnmarshalJSON(data []byte) error {
 	}
 
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
-		s.ExecuteMode = StepExecuteMode(v)
+		s.ExecuteMode = v
 	}
+	//if v, ok := props.GetOk("teamcity.step.conditions"); ok {
+	//	var ecJson [][]string
+	//	err := json.Unmarshal([]byte(v), &ecJson)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	var ecs []ExecuteCondition
+	//	for _, v := range ecJson {
+	//		ecs = append(ecs, ExecuteCondition{v[1], v[0], v[2]})
+	//	}
+	//	s.ExecuteCondition = ecs
+	//}
+
+	//if v, ok := props.GetOk("teamcity.step.conditions"); ok {
+	//	s.ExecuteCondition = strings.Split(v, "\n")
+	//}
 	return nil
 }

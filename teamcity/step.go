@@ -24,18 +24,7 @@ const (
 //StepExecuteMode represents how a build configuration step will execute regarding others.
 type StepExecuteMode = string
 
-const (
-	//StepExecuteModeDefault executes the step only if all previous steps finished successfully.
-	StepExecuteModeDefault = "default"
-	//StepExecuteModeOnlyIfBuildIsSuccessful executes the step only if the whole build is successful.
-	StepExecuteModeOnlyIfBuildIsSuccessful = "execute_if_success"
-	//StepExecuteModeEvenWhenFailed executes the step even if previous steps failed.
-	StepExecuteModeEvenWhenFailed = "execute_if_failed"
-	//StepExecuteAlways executes even if build stop command was issued.
-	StepExecuteAlways = "execute_always"
-)
-
-// Step interface represents a a build configuration/template build step. To interact with concrete step types, see the Step* types.
+// Step interface represents a build configuration/template build step. To interact with concrete step types, see the Step* types.
 type Step interface {
 	GetID() string
 	GetName() string
@@ -89,27 +78,27 @@ var stepReadingFunc = func(dt []byte, out interface{}) error {
 	var step Step
 	var err error
 	switch payload.Type {
-	case string(StepTypePowershell):
+	case StepTypePowershell:
 		var ps StepPowershell
 		err = ps.UnmarshalJSON(dt)
 		step = &ps
-	case string(StepTypeCommandLine):
+	case StepTypeCommandLine:
 		var cmd StepCommandLine
 		err = cmd.UnmarshalJSON(dt)
 		step = &cmd
-	case string(StepTypeOctopusPushPackage):
+	case StepTypeOctopusPushPackage:
 		var opp StepOctopusPushPackage
 		err = opp.UnmarshalJSON(dt)
 		step = &opp
-	case string(StepTypeOctopusCreateRelease):
+	case StepTypeOctopusCreateRelease:
 		var ocr StepOctopusCreateRelease
 		err = ocr.UnmarshalJSON(dt)
 		step = &ocr
-	case string(StepTypeGradle):
+	case StepTypeGradle:
 		var grd StepGradle
 		err = grd.UnmarshalJSON(dt)
 		step = &grd
-	case string(StepTypeDocker):
+	case StepTypeDocker:
 		var dck StepDocker
 		err = dck.UnmarshalJSON(dt)
 		step = &dck
