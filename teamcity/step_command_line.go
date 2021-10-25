@@ -21,11 +21,11 @@ type StepCommandLine struct {
 	CommandParameters string
 	//ExecuteMode is the execute mode for the step. See StepExecuteMode for details.
 	ExecuteMode      StepExecuteMode
-	ExecuteCondition []string
+	ExecuteCondition string
 }
 
 //NewStepCommandLineScript creates a command line build step that runs an inline platform-specific script.
-func NewStepCommandLineScript(name, script, executeStep string, executeConditions []string) (*StepCommandLine, error) {
+func NewStepCommandLineScript(name, script, executeStep, executeConditions string) (*StepCommandLine, error) {
 	if script == "" {
 		return nil, errors.New("script is required")
 	}
@@ -41,7 +41,7 @@ func NewStepCommandLineScript(name, script, executeStep string, executeCondition
 }
 
 //NewStepCommandLineExecutable creates a command line that invokes an external executable.
-func NewStepCommandLineExecutable(name, executable, args, executeStep string, executeConditions []string) (*StepCommandLine, error) {
+func NewStepCommandLineExecutable(name, executable, args, executeStep, executeConditions string) (*StepCommandLine, error) {
 	if executable == "" {
 		return nil, errors.New("executable is required")
 	}
@@ -74,7 +74,9 @@ func (s *StepCommandLine) Type() BuildStepType {
 
 func (s *StepCommandLine) properties() *Properties {
 	props := NewPropertiesEmpty()
-	props.AddOrReplaceValue("teamcity.step.mode", string(s.ExecuteMode))
+	props.AddOrReplaceValue("teamcity.step.mode", s.ExecuteMode)
+	//props.AddOrReplaceValue("teamcity.step.conditions", strings.Join(s.ExecuteCondition, ","))
+	props.AddOrReplaceValue("teamcity.step.conditions", s.ExecuteCondition)
 
 	if s.isExecutable {
 		props.AddOrReplaceValue("command.executable", s.CommandExecutable)
@@ -103,6 +105,12 @@ func (s *StepCommandLine) serializable() *stepJSON {
 func (s *StepCommandLine) MarshalJSON() ([]byte, error) {
 	out := s.serializable()
 	return json.Marshal(out)
+}
+
+type ExecuteCondition struct {
+	Name      string
+	Condition string
+	Value     string
 }
 
 //UnmarshalJSON implements JSON deserialization for StepCommandLine
@@ -137,6 +145,9 @@ func (s *StepCommandLine) UnmarshalJSON(data []byte) error {
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
 		s.ExecuteMode = v
 	}
+	if v, ok := props.GetOk("teamcity.step.conditions"); ok {
+		s.ExecuteCondition = v
+	}
 	//if v, ok := props.GetOk("teamcity.step.conditions"); ok {
 	//	var ecJson [][]string
 	//	err := json.Unmarshal([]byte(v), &ecJson)
@@ -147,11 +158,9 @@ func (s *StepCommandLine) UnmarshalJSON(data []byte) error {
 	//	for _, v := range ecJson {
 	//		ecs = append(ecs, ExecuteCondition{v[1], v[0], v[2]})
 	//	}
+	//
 	//	s.ExecuteCondition = ecs
 	//}
 
-	//if v, ok := props.GetOk("teamcity.step.conditions"); ok {
-	//	s.ExecuteCondition = strings.Split(v, "\n")
-	//}
 	return nil
 }
