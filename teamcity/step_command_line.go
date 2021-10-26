@@ -21,11 +21,11 @@ type StepCommandLine struct {
 	CommandParameters string
 	//ExecuteMode is the execute mode for the step. See StepExecuteMode for details.
 	ExecuteMode      StepExecuteMode
-	ExecuteCondition string
+	ExecuteCondition [][]string
 }
 
 //NewStepCommandLineScript creates a command line build step that runs an inline platform-specific script.
-func NewStepCommandLineScript(name, script, executeStep, executeConditions string) (*StepCommandLine, error) {
+func NewStepCommandLineScript(name, script string) (*StepCommandLine, error) {
 	if script == "" {
 		return nil, errors.New("script is required")
 	}
@@ -41,7 +41,7 @@ func NewStepCommandLineScript(name, script, executeStep, executeConditions strin
 }
 
 //NewStepCommandLineExecutable creates a command line that invokes an external executable.
-func NewStepCommandLineExecutable(name, executable, args, executeStep, executeConditions string) (*StepCommandLine, error) {
+func NewStepCommandLineExecutable(name, executable, args string) (*StepCommandLine, error) {
 	if executable == "" {
 		return nil, errors.New("executable is required")
 	}
@@ -76,8 +76,8 @@ func (s *StepCommandLine) properties() *Properties {
 	props := NewPropertiesEmpty()
 	props.AddOrReplaceValue("teamcity.step.mode", s.ExecuteMode)
 	//props.AddOrReplaceValue("teamcity.step.conditions", strings.Join(s.ExecuteCondition, ","))
-	props.AddOrReplaceValue("teamcity.step.conditions", s.ExecuteCondition)
-
+	ecs, _ := json.Marshal(s.ExecuteCondition)
+	props.AddOrReplaceValue("teamcity.step.conditions", string(ecs))
 	if s.isExecutable {
 		props.AddOrReplaceValue("command.executable", s.CommandExecutable)
 
@@ -120,7 +120,7 @@ func (s *StepCommandLine) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if aux.Type != string(StepTypeCommandLine) {
+	if aux.Type != StepTypeCommandLine {
 		return fmt.Errorf("invalid type %s trying to deserialize into StepCommandLine entity", aux.Type)
 	}
 	s.Name = aux.Name
@@ -145,22 +145,26 @@ func (s *StepCommandLine) UnmarshalJSON(data []byte) error {
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
 		s.ExecuteMode = v
 	}
-	if v, ok := props.GetOk("teamcity.step.conditions"); ok {
-		s.ExecuteCondition = v
-	}
 	//if v, ok := props.GetOk("teamcity.step.conditions"); ok {
-	//	var ecJson [][]string
-	//	err := json.Unmarshal([]byte(v), &ecJson)
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//	var ecs []ExecuteCondition
-	//	for _, v := range ecJson {
-	//		ecs = append(ecs, ExecuteCondition{v[1], v[0], v[2]})
-	//	}
-	//
-	//	s.ExecuteCondition = ecs
+	//	s.ExecuteCondition = strings.Split(v, ",")
 	//}
+
+	if v, ok := props.GetOk("teamcity.step.conditions"); ok {
+		//panic(fmt.Sprintf("%#v", v))
+		var ecJson [][]string
+		_ = json.Unmarshal([]byte(v), &ecJson)
+		////panic(fmt.Sprintf("%#v", ecJson))
+		//if err != nil {
+		//	panic(err)
+		//}
+		//var marshaledEcs []string
+		//for _, v := range ecJson {
+		//	ms, _ := json.Marshal(v)
+		//	marshaledEcs = append(marshaledEcs, string(ms))
+		//}
+		s.ExecuteCondition = ecJson
+		//s.ExecuteCondition = marshaledEcs
+	}
 
 	return nil
 }
