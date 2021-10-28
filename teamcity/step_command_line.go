@@ -75,7 +75,7 @@ func (s *StepCommandLine) Type() BuildStepType {
 func (s *StepCommandLine) properties() *Properties {
 	props := NewPropertiesEmpty()
 	props.AddOrReplaceValue("teamcity.step.mode", s.ExecuteMode)
-	//props.AddOrReplaceValue("teamcity.step.conditions", strings.Join(s.ExecuteCondition, ","))
+
 	ecs, _ := json.Marshal(s.ExecuteCondition)
 	props.AddOrReplaceValue("teamcity.step.conditions", string(ecs))
 	if s.isExecutable {
@@ -105,12 +105,6 @@ func (s *StepCommandLine) serializable() *stepJSON {
 func (s *StepCommandLine) MarshalJSON() ([]byte, error) {
 	out := s.serializable()
 	return json.Marshal(out)
-}
-
-type ExecuteCondition struct {
-	Name      string
-	Condition string
-	Value     string
 }
 
 //UnmarshalJSON implements JSON deserialization for StepCommandLine
@@ -145,25 +139,11 @@ func (s *StepCommandLine) UnmarshalJSON(data []byte) error {
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
 		s.ExecuteMode = v
 	}
-	//if v, ok := props.GetOk("teamcity.step.conditions"); ok {
-	//	s.ExecuteCondition = strings.Split(v, ",")
-	//}
 
 	if v, ok := props.GetOk("teamcity.step.conditions"); ok {
-		//panic(fmt.Sprintf("%#v", v))
 		var ecJson [][]string
 		_ = json.Unmarshal([]byte(v), &ecJson)
-		////panic(fmt.Sprintf("%#v", ecJson))
-		//if err != nil {
-		//	panic(err)
-		//}
-		//var marshaledEcs []string
-		//for _, v := range ecJson {
-		//	ms, _ := json.Marshal(v)
-		//	marshaledEcs = append(marshaledEcs, string(ms))
-		//}
 		s.ExecuteCondition = ecJson
-		//s.ExecuteCondition = marshaledEcs
 	}
 
 	return nil

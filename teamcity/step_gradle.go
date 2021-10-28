@@ -18,9 +18,10 @@ type StepGradle struct {
 	GradleTasksNames string
 	GradleWrapperUse bool
 	ExecuteMode      StepExecuteMode
+	ExecuteCondition [][]string
 }
 
-func NewStepGradle(name, tasks, gradleParams, gradleBuildFile, executeStep string) (*StepGradle, error) {
+func NewStepGradle(name, tasks, gradleParams, gradleBuildFile string) (*StepGradle, error) {
 	if tasks == "" {
 		return nil, errors.New("tasks is required")
 	}
@@ -31,7 +32,6 @@ func NewStepGradle(name, tasks, gradleParams, gradleBuildFile, executeStep strin
 		GradleBuildFile:  gradleBuildFile,
 		GradleTasksNames: tasks,
 		GradleWrapperUse: true,
-		ExecuteMode:      executeStep,
 	}, nil
 }
 
@@ -59,6 +59,8 @@ func (s *StepGradle) properties() *Properties {
 	if s.GradleWrapperUse {
 		props.AddOrReplaceValue("ui.gradleRunner.gradle.wrapper.useWrapper", strconv.FormatBool(s.GradleWrapperUse))
 	}
+	ecs, _ := json.Marshal(s.ExecuteCondition)
+	props.AddOrReplaceValue("teamcity.step.conditions", string(ecs))
 	return props
 }
 
@@ -110,6 +112,11 @@ func (s *StepGradle) UnmarshalJSON(data []byte) error {
 	}
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
 		s.ExecuteMode = v
+	}
+	if v, ok := props.GetOk("teamcity.step.conditions"); ok {
+		var ecJson [][]string
+		_ = json.Unmarshal([]byte(v), &ecJson)
+		s.ExecuteCondition = ecJson
 	}
 	return nil
 }

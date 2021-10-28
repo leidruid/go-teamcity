@@ -20,36 +20,35 @@ type StepPowershell struct {
 	//ScriptArgs are the arguments that will be passed when using "ScriptFile"
 	ScriptArgs string
 	//ExecuteMode is the execute mode for the step. See StepExecuteMode for details.
-	ExecuteMode StepExecuteMode
+	ExecuteMode      StepExecuteMode
+	ExecuteCondition [][]string
 }
 
 //NewStepPowershellScriptFile creates a powershell build step that runs a script file instead of inline code.
-func NewStepPowershellScriptFile(name, scriptFile, scriptArgs, executeStep string) (*StepPowershell, error) {
+func NewStepPowershellScriptFile(name, scriptFile, scriptArgs string) (*StepPowershell, error) {
 	if scriptFile == "" {
 		return nil, errors.New("scriptFile is required")
 	}
 
 	return &StepPowershell{
-		Name:        name,
-		isScript:    true,
-		stepType:    StepTypePowershell,
-		ScriptFile:  scriptFile,
-		ScriptArgs:  scriptArgs,
-		ExecuteMode: executeStep,
+		Name:       name,
+		isScript:   true,
+		stepType:   StepTypePowershell,
+		ScriptFile: scriptFile,
+		ScriptArgs: scriptArgs,
 	}, nil
 }
 
 //NewStepPowershellCode creates a powershell build step that runs the inline code.
-func NewStepPowershellCode(name, code, executeStep string) (*StepPowershell, error) {
+func NewStepPowershellCode(name, code string) (*StepPowershell, error) {
 	if code == "" {
 		return nil, errors.New("code is required")
 	}
 
 	return &StepPowershell{
-		Name:        name,
-		stepType:    StepTypePowershell,
-		Code:        code,
-		ExecuteMode: executeStep,
+		Name:     name,
+		stepType: StepTypePowershell,
+		Code:     code,
 	}, nil
 }
 
@@ -75,6 +74,8 @@ func (s *StepPowershell) properties() *Properties {
 	props.AddOrReplaceValue("jetbrains_powershell_noprofile", "true")
 	props.AddOrReplaceValue("jetbrains_powershell_execution", "PS1")
 
+	ecs, _ := json.Marshal(s.ExecuteCondition)
+	props.AddOrReplaceValue("teamcity.step.conditions", string(ecs))
 	if s.isScript {
 		props.AddOrReplaceValue("jetbrains_powershell_script_mode", "FILE")
 		props.AddOrReplaceValue("jetbrains_powershell_script_file", s.ScriptFile)
@@ -134,6 +135,11 @@ func (s *StepPowershell) UnmarshalJSON(data []byte) error {
 
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
 		s.ExecuteMode = StepExecuteMode(v)
+	}
+	if v, ok := props.GetOk("teamcity.step.conditions"); ok {
+		var ecJson [][]string
+		_ = json.Unmarshal([]byte(v), &ecJson)
+		s.ExecuteCondition = ecJson
 	}
 	return nil
 }

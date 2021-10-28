@@ -30,7 +30,8 @@ type StepDocker struct {
 	// teamcity.build.workingDir
 	WorkingDir string
 	// teamcity.step.mode
-	ExecuteMode StepExecuteMode
+	ExecuteMode      StepExecuteMode
+	ExecuteCondition [][]string
 }
 
 func NewStepDocker(name string, commandType string) (*StepDocker, error) {
@@ -83,6 +84,8 @@ func (s *StepDocker) properties() *Properties {
 		props.AddOrReplaceValue("docker.sub.command", s.Content)
 		props.AddOrReplaceValue("teamcity.build.workingDir", s.WorkingDir)
 	}
+	ecs, _ := json.Marshal(s.ExecuteCondition)
+	props.AddOrReplaceValue("teamcity.step.conditions", string(ecs))
 	return props
 }
 
@@ -154,6 +157,11 @@ func (s *StepDocker) UnmarshalJSON(data []byte) error {
 	}
 	if v, ok := props.GetOk("teamcity.step.mode"); ok {
 		s.ExecuteMode = v
+	}
+	if v, ok := props.GetOk("teamcity.step.conditions"); ok {
+		var ecJson [][]string
+		_ = json.Unmarshal([]byte(v), &ecJson)
+		s.ExecuteCondition = ecJson
 	}
 	return nil
 }
