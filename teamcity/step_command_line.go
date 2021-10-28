@@ -31,12 +31,10 @@ func NewStepCommandLineScript(name, script string) (*StepCommandLine, error) {
 	}
 
 	return &StepCommandLine{
-		Name:             name,
-		isExecutable:     false,
-		stepType:         StepTypeCommandLine,
-		CustomScript:     script,
-		ExecuteMode:      executeStep,
-		ExecuteCondition: executeConditions,
+		Name:         name,
+		isExecutable: false,
+		stepType:     StepTypeCommandLine,
+		CustomScript: script,
 	}, nil
 }
 
@@ -52,8 +50,6 @@ func NewStepCommandLineExecutable(name, executable, args string) (*StepCommandLi
 		isExecutable:      true,
 		CommandExecutable: executable,
 		CommandParameters: args,
-		ExecuteMode:       executeStep,
-		ExecuteCondition:  executeConditions,
 	}, nil
 }
 
