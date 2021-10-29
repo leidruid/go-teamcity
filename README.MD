@@ -1,13 +1,13 @@
 # go-teamcity #
 
-[![GoDoc](https://godoc.org/github.com/leidruid/go-teamcity/github?status.svg)](https://godoc.org/github.com/leidruid/go-teamcity) [![Build Status](https://travis-ci.com/cvbarros/go-teamcity.svg?branch=master)](https://travis-ci.com/cvbarros/go-teamcity)
+[![GoDoc](https://godoc.org/github.com/leidruid/go-teamcity/github?status.svg)](https://godoc.org/github.com/leidruid/go-teamcity) [![Build Status](https://travis-ci.com/leidruid/go-teamcity.svg?branch=master)](https://travis-ci.com/leidruid/go-teamcity)
 
 
 ## LOOKING FOR MAINTAINTERS ##
 
 This project is in need of new maintainers, please see here:
 https://github.com/leidruid/go-teamcity/issues/94.
-https://github.com/cvbarros/terraform-provider-teamcity/issues/113
+https://github.com/leidruid/terraform-provider-teamcity/issues/113
 
 ---
 _go-teamcity_ is a Go client library interacting with Jetbrain's [TeamCity CI server REST API](https://confluence.jetbrains.com/display/TCD10/REST+API).
@@ -15,7 +15,7 @@ Currently, guaranteed supported API version (on CI tests) is **TeamCity 2019.2.2
 
 ## Motivation ##
 go-teamcity is intended for automating Jetbrain's TeamCity tasks and configurations using Go.
-It is also the client library used in [TeamCity Provider](https://github.com/cvbarros/terraform-provider-teamcity), a [Hashicorp's Terraform](https://www.terraform.io) custom provider to configure TeamCity as code.
+It is also the client library used in [TeamCity Provider](https://github.com/leidruid/terraform-provider-teamcity), a [Hashicorp's Terraform](https://www.terraform.io) custom provider to configure TeamCity as code.
 
 ## Usage ##
 
