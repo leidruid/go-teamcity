@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cvbarros/go-teamcity/teamcity"
+	"github.com/leidruid/go-teamcity/teamcity"
 	"github.com/stretchr/testify/suite"
 )
 
