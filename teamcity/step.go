@@ -14,6 +14,7 @@ const (
 	//StepTypeDotnetCli step type
 	StepTypeDotnetCli BuildStepType = "dotnet.cli"
 	//StepTypeCommandLine (shell/cmd) step type
+	StepTypeScanDzi              BuildStepType = "SecurityChecksSastScaDzi"
 	StepTypeCommandLine          BuildStepType = "simpleRunner"
 	StepTypeGradle               BuildStepType = "gradle-runner"
 	StepTypeDocker               BuildStepType = "DockerCommand"
